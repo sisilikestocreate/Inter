@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   // Combine system prompt + user prompt (works on all Gemini free tier)
   const fullPrompt = systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt;
 
-  const model = 'gemini-2.5-flash-preview-04-17';
+  const model = 'gemini-2.0-flash';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   try {
