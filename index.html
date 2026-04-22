@@ -445,6 +445,9 @@ async function aiCall(prompt, sys = '') {
   }
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
+    if (res.status === 429 || err?.error === 'TOO_BUSY') {
+      throw new Error('TOO_BUSY');
+    }
     throw new Error(err?.error || `Server error ${res.status}`);
   }
   const data = await res.json();
@@ -862,10 +865,9 @@ Rules:
   } catch(err) {
     console.error('Analysis error:', err);
     const msg = err.message === 'NETWORK_ERROR' ? 'Network error — check connection'
-      : err.message.includes('rate limit') || err.message.includes('Rate limit') ? 'Too many requests — waiting a moment…'
+      : err.message === 'TOO_BUSY' ? 'Too many people on the site right now — please try again in a moment!'
       : 'Analysis error — ' + err.message.slice(0, 50);
     setStatus(msg);
-    if (msg.includes('waiting')) setTimeout(() => { S.busy.analysis = false; runAnalysis(); }, 8000);
   }
   S.busy.analysis = false;
 }
@@ -963,7 +965,7 @@ Use exact existing labels in connectsTo. Return {"gaps":[]} if map is complete.`
   } catch(err) {
     console.error('Suggest error:',err);
     thinkEl.classList.remove('active');
-    setStatus(err.message==='NETWORK_ERROR'?'Network error':'Gap analysis failed — '+err.message.slice(0,50));
+    setStatus(err.message==='NETWORK_ERROR' ? 'Network error' : err.message==='TOO_BUSY' ? 'Too many people on the site right now — please try again in a moment!' : 'Gap analysis failed — '+err.message.slice(0,50));
   }
   S.busy.suggest=false; setSuggestBtn();
 }
