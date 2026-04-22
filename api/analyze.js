@@ -74,6 +74,6 @@ export default async function handler(req, res) {
     }
   }
 
-  // All models exhausted
-  return res.status(429).json({ error: 'All models are currently rate limited. Please wait a moment and try again.' });
+  // All models exhausted — friendly message
+  return res.status(429).json({ error: 'TOO_BUSY' });
 }
